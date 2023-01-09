@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.spring.javawspring.vo.MemberVO;
 
 public interface MemberService {
@@ -13,7 +15,7 @@ public interface MemberService {
 
 	public MemberVO getMemberNickNameCheck(String nickName);
 
-	public int getMemberJoinOk(MemberVO vo);
+	public int getMemberJoinOk(MemberVO vo, MultipartFile fName, HttpServletRequest request);
 
 	public void setMemberVisitCnt(MemberVO vo);
 
@@ -25,8 +27,10 @@ public interface MemberService {
 
 	public int totRecCnt(String mid);
 
-	public void getPwdcertificationProcess(String toMail, String mid, HttpServletRequest request, HttpServletResponse response);
+	public void getPswdcertificationProcess(String toMail, String mid, int sw, HttpServletRequest request);
 
 	public void setNewEncPswd(String encPswd, String mid);
+
+	public int setMemberInforUpdate(MemberVO vo, MultipartFile fName, HttpServletRequest request);
 
 }

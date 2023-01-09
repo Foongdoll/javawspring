@@ -12,7 +12,8 @@
 	
 	$(document).ready(function(){
 		let ans = prompt('아이디를 입력해주세요.');
-		if(ans == ${sMid}){
+		if(ans != '${sMid}'){
+			alert('비밀번호가 일치하지않습니다.');
 			location.href='${ctp}/member/memberMain';			
 		}
 	});

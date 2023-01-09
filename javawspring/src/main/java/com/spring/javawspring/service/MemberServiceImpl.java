@@ -1,5 +1,8 @@
 package com.spring.javawspring.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,10 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.javawspring.common.JavawspringProvide;
 import com.spring.javawspring.dao.MemberDAO;
 import com.spring.javawspring.vo.MemberVO;
 
@@ -38,9 +45,28 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public int getMemberJoinOk(MemberVO vo) {
+	public int getMemberJoinOk(MemberVO vo, MultipartFile fName, HttpServletRequest request) {
+		int res = 0;
+		try {
+				String oFileName = fName.getOriginalFilename();
+			if(oFileName.equals(""))  vo.setPhoto("noimage.jpg");
+			else {
+				String uid = UUID.randomUUID().toString();
+				String saveFileName = uid + "_" + oFileName;
+				
+				@SuppressWarnings("deprecation")
+				String realPath = request.getRealPath("/resources/member/");
+				vo.setPhoto(saveFileName);
+				
+				new JavawspringProvide().writerFile(fName, saveFileName, request, realPath);
+				res = 1;
+			}
+			memberDAO.getMemberJoinOk(vo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		return memberDAO.getMemberJoinOk(vo);
+		return res;
 	}
 
 	@Override
@@ -93,13 +119,14 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void getPwdcertificationProcess(String toMail, String mid, 
-			HttpServletRequest request, HttpServletResponse response) {
-		
+	public void getPswdcertificationProcess(String toMail, String mid, int sw, HttpServletRequest request) {
+		int res = 0;
 		try {
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper  messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+			
+			if(sw == 0) {
 				// 메세지 객체 생성 그 메세지를 담을(감싸줄) 헬퍼 객체 생성 
-				MimeMessage message = mailSender.createMimeMessage();
-				MimeMessageHelper  messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 				
 				String content = "인증 번호는";
 				
@@ -107,26 +134,77 @@ public class MemberServiceImpl implements MemberService {
 				messageHelper.setSubject("그린 길동이네 이메일 인증");
 				messageHelper.setText(content);
 				
-				UUID uuid = UUID.randomUUID();
-				String certificationNumber = uuid.toString().substring(0,8);
+				String certificationNumber = UUID.randomUUID().toString().substring(0,8);
 				memberDAO.setCertificationNumber(certificationNumber,mid);
 				// uuid 발급 후 uuid 필드의 값으로 저장 후 메일 내용에도 인증번호 추가 
-				content += certificationNumber+"입니다.";
-				content = content.replace("\n", "<br/>");
-				
+				content += "<hr/>";
+				content += "<font color='red'><b>"+certificationNumber+"</b></font>입니다.";
+				content += "<hr/>그린에서 보냅니다.";
 				messageHelper.setText(content , true);
 				
-				mailSender.send(message);
+				content = content.replace("\n", "<br/>");
+				messageHelper.setText(content , true);
+				FileSystemResource file = new FileSystemResource("C:\\Users\\green\\git\\springrepository\\javawspring\\src\\main\\webapp\\resources\\images\\main.JPG");
+				messageHelper.addInline("main.JPG", file);
 				
+				file = new FileSystemResource("C:\\Users\\green\\git\\springrepository\\javawspring\\src\\main\\webapp\\resources\\images\\newyork.jpg");
+				messageHelper.addAttachment("newyork.jpg", file);
+				
+			}
+			else if(sw == 1){
+				
+				String certificationNumber = UUID.randomUUID().toString().substring(0,8);
+				memberDAO.setCertificationNumber(certificationNumber,mid);
+				String content = "<b>그린 회원정보 수정 메일인증</b>";
+				content += "<p>인증번호<b>"+certificationNumber+"</b></p>";
+				content += "<p>그린 그린 ~</p>";
+				content = content.replace("\n", "<br/>");
+				
+				messageHelper.setText(content);
+				
+				String realPath = request.getRealPath("/resources/member/");
+				FileSystemResource file = new FileSystemResource(realPath+"개굴.gif");
+				messageHelper.addInline("개굴.gif", file);
+				res = 1;
+			}
+				
+				mailSender.send(message);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}		
-		
 	}
 
 	@Override
 	public void setNewEncPswd(String encPswd, String mid) {
 		memberDAO.setNewEncPswd(encPswd,mid);
 	}
+
+	@Override
+	public int setMemberInforUpdate(MemberVO vo,MultipartFile fName, HttpServletRequest request) {
+		
+		String uid = UUID.randomUUID().toString();
+		String oFileName = fName.getOriginalFilename();
+		String saveFileName = uid+"_"+oFileName;
+		String realPath = request.getRealPath("/resources/member/");
+		String photo = memberDAO.getMemberFileName((String)request.getSession().getAttribute("sMid"));
+		
+		if(!vo.getPhoto().equals(photo)) {
+			File file = new File(realPath+"/"+photo);
+			if(file.exists()) {
+				file.delete();
+			}
+			try {
+				new JavawspringProvide().writerFile(fName, saveFileName, request, realPath);
+			} catch (IOException e) {e.printStackTrace();}
+			
+			vo.setPhoto(saveFileName);
+		}
+		else {
+			
+		}
+		
+		return memberDAO.setMemberInforUpdate(vo);
+	}
+
 	
 }

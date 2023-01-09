@@ -64,6 +64,27 @@
 		
 	}
 
+	
+	function eCheck(){
+		let mid = $("#mid").val();
+		let toMail = $("toMail").val();
+		
+		if(mid.trim() == ''){
+			alert("아이디를 입력해주세요.");
+			$("#mid").focus();
+			return;
+		}
+		else if(toMail == ''){
+			alert("이메일을 입력해주세요.");
+			$("#toMail").focus();
+			return;
+		}
+		else {
+			myform.submit();
+		}
+	}
+	
+	
 </script>
 <body>
   <jsp:include page="/WEB-INF/views/include/nav.jsp"></jsp:include>
@@ -80,7 +101,7 @@
 			<tr>
 				<th>아이디</th>
 				<td>
-					<input type="text" name="mid" class="form-control" required/>
+					<input type="text" name="mid" id="mid" class="form-control" required/>
 				</td>
 			</tr>
 			<tr>
@@ -89,7 +110,7 @@
 			</tr>
 			<tr>
 				<td colspan="2" class="text-center">
-					<input type="submit" value="이메일 인증번호발급" class="btn btn-success"/>
+					<input type="button" value="이메일 인증번호발급" onclick="eCheck()" class="btn btn-success"/>
 					<input type="reset" value="다시 쓰기" class="btn btn-secondary"/>
 					<input type="button" value="돌아가기" onclick="location.href='${ctp}/member/memberLogin'" class="btn btn-info"/>
 				</td>

@@ -29,6 +29,10 @@ public interface MemberDAO {
 
 	public void setNewEncPswd(@Param("encPswd") String encPswd,@Param("mid") String mid);
 
+	public int setMemberInforUpdate(@Param("vo") MemberVO vo);
+
+	public String getMemberFileName(String mid);
+
 	
 	
 }

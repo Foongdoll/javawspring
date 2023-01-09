@@ -3,32 +3,34 @@ package com.spring.javawspring;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javawspring.pagination.PageProcess;
 import com.spring.javawspring.pagination.PageVO;
 import com.spring.javawspring.service.MemberService;
-import com.spring.javawspring.vo.GuestVO;
 import com.spring.javawspring.vo.MemberVO;
 
 @Controller
 @RequestMapping("/member")
 public class MemberController {
 	private String tableName = "member2";
+	@Autowired
+	JavaMailSender mailSender;
 	
 	@Autowired
 	PageProcess pageProcess;
@@ -115,12 +117,11 @@ public class MemberController {
 		String mid = (String)session.getAttribute("sMid");
 		
 		MemberVO vo = memberService.getMemberIdCheck(mid);
-		
 		model.addAttribute("vo" , vo);
 		
-		return "member/memberMain";
+		return "member/memberMain"; 
 	}
-	
+  
 	// 회원 가입 폼
 	@RequestMapping(value = "/memberJoin", method = RequestMethod.GET)
 	public String memberJoinGet() {
@@ -129,7 +130,7 @@ public class MemberController {
 	}
 	// 회원 가입 처리
 	@RequestMapping(value = "/memberJoin", method = RequestMethod.POST)
-	public String memberJoinPost(MemberVO vo) {
+	public String memberJoinPost(MultipartFile fName,MemberVO vo,HttpServletRequest request) {
 		
 		if(memberService.getMemberIdCheck(vo.getMid()) != null) {
 			return "redirect:/msg/memberIdCheckNo";
@@ -142,7 +143,7 @@ public class MemberController {
 			vo.setPwd(PasswordEncoder.encode(vo.getPwd()));
 			
 			// 체크가 완료되면 vo에 담긴자료를 DB에 저장시켜준다. (회원 가입)
-			int res = memberService.getMemberJoinOk(vo);
+			int res = memberService.getMemberJoinOk(vo,fName,request);
 			
 			if(res == 1) return "redirect:/msg/memberJoinOk";
 			else return "redirect:/msg/memberJoinNo";	
@@ -228,6 +229,7 @@ public class MemberController {
 		return "member/memberList";
 	}
 	
+
 	@RequestMapping(value = "/memberIdSearch", method = RequestMethod.GET)
 	public String memberIdSearchGet() {
 		return "member/memberIdSearch";
@@ -239,7 +241,7 @@ public class MemberController {
 	    MemberVO vo = memberService.getMemberIdSearch(searchStr,category);
 		return vo;
 	}
-	
+	// 비밀번호 찾기 폼	
 	@RequestMapping(value = "/memberPwdSearch", method = RequestMethod.GET)
 	public String memberPwdSearchGet(@RequestParam(name="pwdSw", defaultValue = "", required = false) int pwdSw,
 			@RequestParam(name="mid", defaultValue = "", required = false) String mid,
@@ -259,7 +261,7 @@ public class MemberController {
 			return "redirect:/msg/emailNo";
 		}
 		else {
-			memberService.getPwdcertificationProcess(toMail, mid, request, response); // 지금 DB안에 uuid가 안바뀜 근대 비밀번호는 최신  uuid로 바뀜
+			memberService.getPswdcertificationProcess(toMail, mid, 0, request); // 지금 DB안에 uuid가 안바뀜 근대 비밀번호는 최신  uuid로 바뀜
 			return "redirect:/msg/memberPwdSearchOk?mid="+mid;
 		}
 	}
@@ -280,7 +282,6 @@ public class MemberController {
 			memberService.setNewEncPswd(encPswd,mid); //DB 비밀번호를 발급받은 임시비밀번호로 바꿔줌
 			res = uuid;
 		}
-		
 		return res;
 	}
 	
@@ -351,7 +352,59 @@ public class MemberController {
 		return res;
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/memberCheck", method = RequestMethod.POST)
+	public MemberVO memberCheckPost(HttpServletRequest request,int idx,
+			@RequestParam(name = "pwd", defaultValue = "", required = false) String pwd, 
+			@RequestParam(name = "email", defaultValue = "", required = false) String email) throws MessagingException {
+		String mid = (String)request.getSession().getAttribute("sMid");
+		MemberVO vo = memberService.getMemberIdCheck(mid);
+		// 0 : 비밀번호 인증 1 : 이메일 인증
+		if(idx == 0) {
+			if(!PasswordEncoder.matches(pwd, vo.getPwd())) vo = null;
+		}
+		else {
+			memberService.getPswdcertificationProcess(email, mid, 1, request);
+			vo = memberService.getMemberIdCheck(mid);
+		}
+		
+		return vo;
+	}
 	
+	@RequestMapping(value = "/memberInforUpdate", method = RequestMethod.GET)
+	public String memberInforUpdateGet(Model model,HttpSession session) {
+		String mid = (String)session.getAttribute("sMid");
+		MemberVO vo = memberService.getMemberIdCheck(mid);
+		vo.setEmail1(vo.getEmail().split("@")[0]);
+		vo.setEmail2(vo.getEmail().split("@")[1]);
+		
+		vo.setTel1(vo.getTel().split("-")[0]);
+		vo.setTel2(vo.getTel().split("-")[1]);
+		vo.setTel3(vo.getTel().split("-")[2]);
+		
+		if(vo.getAddress().split("/").length == 3) {
+			vo.setPostcode(vo.getAddress().split("/")[0]);
+			vo.setRoadAddress(vo.getAddress().split("/")[1]);
+			vo.setDetailAddress(vo.getAddress().split("/")[2]);
+		}
+		else if(vo.getAddress().split("/").length == 4) {
+			vo.setPostcode(vo.getAddress().split("/")[0]);
+			vo.setRoadAddress(vo.getAddress().split("/")[1]);
+			vo.setDetailAddress(vo.getAddress().split("/")[2]);
+			vo.setExtraAddress(vo.getAddress().split("/")[3]);
+		}
+		
+		model.addAttribute("vo", vo);
+		
+		return "member/memberInforUpdate";
+	}
 	
+	@RequestMapping(value = "/memberInforUpdate", method = RequestMethod.POST)
+	public String memberInforUpdatePost(MemberVO vo, MultipartFile fName, HttpServletRequest request) {
+		
+		int res = memberService.setMemberInforUpdate(vo,fName,request);
+		if(res == 1) return "redirect:/msg/memberInforUpdateOk";
+		else return "redirect:/msg/memberInforUpdateNo";
+	}
 	
 }

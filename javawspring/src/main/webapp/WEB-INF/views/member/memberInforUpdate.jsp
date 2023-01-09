@@ -12,9 +12,6 @@
   <script src="${ctp}/js/woo.js"></script>
   <script>
     'use strict';
-    // 아이디와 닉네임 중복버튼을 클릭했는지를 확인하기위한 전역변수를 정의한다.(버튼클릭후에도 내용을 수정했다면 초기값은 0으로 셋팅해서 버튼을 누를수 있도록해야한다.)
-    let idCheckSw = 0;
-  	let nickCheckSw = 0;
     
     // 회원가입폼 체크후 서버로 전송(submit)
     function fCheck() {
@@ -31,9 +28,6 @@
       let submitFlag = 0;		// 전송체크버튼으로 값이 1이면 체크완료되어 전송처리한다.
 
       // 유효성검사를 위해 폼안의 내용들을 모두 변수에 담는다.
-    	let mid = myform.mid.value;	
-    	let pwd = myform.pwd.value;
-    	let nickName = myform.nickName.value;
     	let name = myform.name.value;
     	let email1 = myform.email1.value;
     	let email2 = myform.email2.value;
@@ -52,22 +46,7 @@
     	
     	
     	// 유효성 검사체크처리한다.(필수 입력필드는 꼭 처리해야 한다.)
-    	if(!regMid.test(mid)) {
-        alert("아이디는 영문 소문자와 숫자, 언더바(_)만 사용가능합니다.(길이는 4~20자리까지 허용)");
-        myform.mid.focus();
-        return false;
-      }
-      else if(!regPwd.test(pwd)) {
-        alert("비밀번호는 1개이상의 문자와 특수문자 조합의 6~24 자리로 작성해주세요.");
-        myform.pwd.focus();
-        return false;
-      }
-      else if(!regNickName.test(nickName)) {
-        alert("닉네임은 한글만 사용가능합니다.");
-        myform.nickName.focus();
-        return false;
-      }
-      else if(!regName.test(name)) {
+      if(!regName.test(name)) {
         alert("성명은 한글과 영문대소문자만 사용가능합니다.");
         myform.name.focus();
         return false;
@@ -111,10 +90,9 @@
   		let detailAddress = myform.detailAddress.value + " ";
   		let extraAddress = myform.extraAddress.value + " ";
   		myform.address.value = postcode + "/" + roadAddress + "/" + detailAddress + "/" + extraAddress + "/";
-  		
   		// 전송전에 파일에 관한 사항체크...(회원사진의 내역이 비었으면 noimage를 hidden필드인 photo필드에 담아서 전송한다.)
   		if(fName.trim() == "") {
-  			myform.photo.value = "noimage.jpg"
+  			myform.photo.value = '${vo.photo}';
 				submitFlag = 1;
   		}
   		else {
@@ -138,89 +116,15 @@
     	
   		// 전송전에 모든 체크가 끝나서 submitFlag가 1이되면 서버로 전송한다.
     	if(submitFlag == 1) {
-    		if(idCheckSw == 0) {
-    			alert("아이디 중복체크버튼을 눌러주세요!");
-    			document.getElementById("midBtn").focus();
-    		}
-    		else if(nickCheckSw == 0) {
-    			alert("닉네임 중복체크버튼을 눌러주세요!");
-    			document.getElementById("nickNameBtn").focus();
-    		}
-    		else {
-	  			// 묶여진 필드(email/tel)를 폼태그안에 hidden태그의 값으로 저장시켜준다.
 	  			myform.email.value = email;
 	  			myform.tel.value = tel;
 	  			
 	  			myform.submit();
     		}
-    	}
-    	else {
-    		alert("회원가입 실패~~");
-    	}
+    	else alert("회원가입 실패~~");
     }
     
-    // id 중복체크
-    function idCheck() {
-    	let mid = myform.mid.value;
-    	
-    	if(mid.trim() == "" || mid.length < 4) {
-    		alert("아이디를 확인하세요!");
-    		myform.mid.focus();
-    		return;
-    	}
-				
-    		$.ajax({
-    			type : "post",
-    			url  : "${ctp}/member/memberIdCheck",
-    			data : {mid : mid},
-    			success : function(res){
-						if(res == "1"){
-							alert("이미 사용중인 아이디입니다.");
-						} 
-						else {
-							alert("사용 가능한 아이디입니다.");
-			    		idCheckSw = 1;
-			    		$("#mid").attr("readonly", true);
-						}
-    			},
-    			error : function(){
-    				alert("전송 오류");
-    			}
-    		});
-    		
-    }
     
-    // nickName 중복체크
-    function nickCheck() {
-    	let nickName = myform.nickName.value;
-    	
-    	if(nickName == "") {
-    		alert("닉네임을 입력하세요!");
-    		myform.nickName.focus();
-    	}
-    	else {
-    	
-    		
-    		$.ajax({
-    			type : "post",
-    			url  : "${ctp}/member/memberNickNameCheck",
-    			data : {nickName : nickName},
-    			success : function(res){
-						if(res == "1"){
-							alert("이미 사용중인 닉네임입니다.");
-						} 
-						else {
-							alert("사용 가능한 닉네임입니다.");
-							nickCheckSw = 1;
-							$("#nickName").attr("readonly", true);
-						}
-    			},
-    			error : function(){
-    				alert("전송 오류");
-    			}
-    		});
-    	}
-    }
   </script>
 </head>
 <body>
@@ -230,36 +134,36 @@
 <div class="container" style="padding:30px">
  <!--  <form name="myform" method="post" class="was-validated" enctype="multipart/form-data"> -->
   <form name="myform" method="post" enctype="multipart/form-data" class="was-validated">
-    <h2>회 원 가 입</h2>
+    <h2>회 원 정 보 수 정</h2>
     <br/>
     <div class="form-group">
-      <label for="mid">아이디 : &nbsp; &nbsp;<input type="button" value="아이디 중복체크" id="midBtn" class="btn btn-secondary btn-sm" onclick="idCheck()"/></label>
-      <input type="text" class="form-control" name="mid" id="mid" placeholder="아이디를 입력하세요." maxlength="20" required autofocus/>
+      <label for="mid">아이디 : </label>
+      <input type="text" class="form-control" name="mid" id="mid" value="${vo.mid}"   readonly/>
     </div>
     <div class="form-group">
       <label for="pwd">비밀번호 :</label>
-      <input type="password" class="form-control" id="pwd" placeholder="비밀번호를 입력하세요." name="pwd" required />
+      <input type="password" class="form-control" id="pwd" name="pwd" value="${vo.pwd}" readonly required />
     </div>
     <div class="form-group">
-      <label for="nickName">닉네임 : &nbsp; &nbsp;<input type="button" value="닉네임 중복체크" id="nickNameBtn" class="btn btn-secondary btn-sm" onclick="nickCheck()"/></label>
-      <input type="text" class="form-control" id="nickName" placeholder="별명을 입력하세요." name="nickName" required />
+      <label for="nickName">닉네임 :</label> 
+      <input type="text" class="form-control" id="nickName" value="${vo.nickName}" name="nickName" readonly required />
     </div>
     <div class="form-group">
       <label for="name">성명 :</label>
-      <input type="text" class="form-control" id="name" placeholder="성명을 입력하세요." name="name" required />
+      <input type="text" class="form-control" id="name" value="${vo.name}" name="name" required />
     </div>
     <div class="form-group">
       <label for="email1">Email address:</label>
 				<div class="input-group mb-3">
-				  <input type="text" class="form-control" placeholder="Email을 입력하세요." id="email1" name="email1" required />
+				  <input type="text" class="form-control"  id="email1" name="email1" value="${vo.email1 }" required />
 				  <div class="input-group-append">
 				    <select name="email2" class="custom-select">
-					    <option value="naver.com" selected>naver.com</option>
-					    <option value="hanmail.net">hanmail.net</option>
-					    <option value="hotmail.com">hotmail.com</option>
-					    <option value="gmail.com">gmail.com</option>
-					    <option value="nate.com">nate.com</option>
-					    <option value="yahoo.com">yahoo.com</option>
+					    <option value="naver.com" 	<c:if test="${vo.email2 == 'naver.com'}">selected</c:if>>naver.com</option>
+					    <option value="hanmail.net" <c:if test="${vo.email2 == 'hanmail.net'}">selected</c:if>>hanmail.net</option>
+					    <option value="hotmail.com" <c:if test="${vo.email2 == 'hotmail.com'}">selected</c:if>>hotmail.com</option>
+					    <option value="gmail.com" 	<c:if test="${vo.email2 == 'gmail.com'}">selected</c:if>>gmail.com</option>
+					    <option value="nate.com" 		<c:if test="${vo.email2 == 'nate.com'}">selected</c:if>>nate.com</option>
+					    <option value="yahoo.com"		<c:if test="${vo.email2 == 'yahoo.com'}">selected</c:if>>yahoo.com</option>
 					  </select>
 				  </div>
 				</div>
@@ -268,12 +172,12 @@
       <div class="form-check-inline">
         <span class="input-group-text">성별 :</span> &nbsp; &nbsp;
 			  <label class="form-check-label">
-			    <input type="radio" class="form-check-input" name="gender" value="남자" checked>남자
+			    <input type="radio" class="form-check-input" name="gender" value="남자" <c:if test="${vo.gender == '남자'}">checked</c:if>>남자
 			  </label>
 			</div>
 			<div class="form-check-inline">
 			  <label class="form-check-label">
-			    <input type="radio" class="form-check-input" name="gender" value="여자">여자
+			    <input type="radio" class="form-check-input" name="gender"  value="여자" <c:if test="${vo.gender == '여자'}">checked</c:if>>여자
 			  </label>
 			</div>
     </div>
@@ -286,56 +190,56 @@
 	      <div class="input-group-prepend">
 	        <span class="input-group-text">전화번호 :</span> &nbsp;&nbsp;
 			      <select name="tel1" class="custom-select">
-					    <option value="010" selected>010</option>
-					    <option value="02">서울</option>
-					    <option value="031">경기</option>
-					    <option value="032">인천</option>
-					    <option value="041">충남</option>
-					    <option value="042">대전</option>
-					    <option value="043">충북</option>
-			        <option value="051">부산</option>
-			        <option value="052">울산</option>
-			        <option value="061">전북</option>
-			        <option value="062">광주</option>
+					    <option value="010" <c:if test="${vo.tel1 =='010'}">selected</c:if>>010</option>
+					    <option value="02" <c:if test="${vo.tel1 =='02'}">selected</c:if>>서울</option>
+					    <option value="031" <c:if test="${vo.tel1 =='031'}">selected</c:if>>경기</option>
+					    <option value="032" <c:if test="${vo.tel1 =='032'}">selected</c:if>>인천</option>
+					    <option value="041" <c:if test="${vo.tel1 =='041'}">selected</c:if>>충남</option>
+					    <option value="042" <c:if test="${vo.tel1 =='042'}">selected</c:if>>대전</option>
+					    <option value="043" <c:if test="${vo.tel1 =='043'}">selected</c:if>>충북</option>
+			        <option value="051" <c:if test="${vo.tel1 =='051'}">selected</c:if>>부산</option>
+			        <option value="052" <c:if test="${vo.tel1 =='052'}">selected</c:if>>울산</option>
+			        <option value="061" <c:if test="${vo.tel1 =='061'}">selected</c:if>>전북</option>
+			        <option value="062" <c:if test="${vo.tel1 =='062'}">selected</c:if>>광주</option>
 					  </select>-
 	      </div>
-	      <input type="text" name="tel2" size=4 maxlength=4 class="form-control"/>-
-	      <input type="text" name="tel3" size=4 maxlength=4 class="form-control"/>
+	      <input type="text" name="tel2" value="${vo.tel2}" class="form-control"/>-
+	      <input type="text" name="tel3" value="${vo.tel3}" class="form-control"/>
 	    </div> 
     </div>
     <div class="form-group">
       <label for="address">주소</label>
 			<input type="hidden" name="address" id="address">
 			<div class="input-group mb-1">
-				<input type="text" name="postcode" id="sample6_postcode" placeholder="우편번호" class="form-control">
+				<input type="text" name="postcode" id="sample6_postcode" placeholder="우편번호" value="${vo.postcode}" class="form-control">
 				<div class="input-group-append">
 					<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기" class="btn btn-secondary">
 				</div>
 			</div>
-			<input type="text" name="roadAddress" id="sample6_address" size="50" placeholder="주소" class="form-control mb-1">
+			<input type="text" name="roadAddress" id="sample6_address" size="50" placeholder="주소" value="${vo.roadAddress}" class="form-control mb-1">
 			<div class="input-group mb-1">
-				<input type="text" name="detailAddress" id="sample6_detailAddress" placeholder="상세주소" class="form-control"> &nbsp;&nbsp;
+				<input type="text" name="detailAddress" id="sample6_detailAddress" placeholder="상세주소" value="${vo.detailAddress}" class="form-control"> &nbsp;&nbsp;
 				<div class="input-group-append">
-					<input type="text" name="extraAddress" id="sample6_extraAddress" placeholder="참고항목" class="form-control">
+					<input type="text" name="extraAddress" id="sample6_extraAddress" placeholder="참고항목" value="${vo.extraAddress}" class="form-control">
 				</div>
 			</div>
     </div>
     <div class="form-group">
 	    <label for="homepage">Homepage address:</label>
-	    <input type="text" class="form-control" name="homePage" value="http://" placeholder="홈페이지를 입력하세요." id="homePage"/>
+	    <input type="text" class="form-control" name="homePage" value="${vo.homePage}" placeholder="홈페이지를 입력하세요." id="homePage"/>
 	  </div>
     <div class="form-group">
       <label for="job">직업</label>
       <select class="form-control" id="job" name="job">
-        <option>학생</option>
-        <option>회사원</option>
-        <option>공무원</option>
-        <option>군인</option>
-        <option>의사</option>
-        <option>법조인</option>
-        <option>세무인</option>
-        <option>자영업</option>
-        <option>기타</option>
+        <option <c:if test="${vo.job == '학생'}">selected</c:if>>학생</option>
+        <option <c:if test="${vo.job == '회사원'}">selected</c:if>>회사원</option>
+        <option <c:if test="${vo.job == '공무원'}">selected</c:if>>공무원</option>
+        <option <c:if test="${vo.job == '군인'}">selected</c:if>>군인</option>
+        <option <c:if test="${vo.job == '의사'}">selected</c:if>>의사</option>
+        <option <c:if test="${vo.job == '법조인'}">selected</c:if>>법조인</option>
+        <option <c:if test="${vo.job == '세무인'}">selected</c:if>>세무인</option>
+        <option <c:if test="${vo.job == '자영업'}">selected</c:if>>자영업</option>
+        <option <c:if test="${vo.job == '기타'}">selected</c:if>>기타</option>
       </select>
     </div>
     <div class="form-group">
@@ -383,26 +287,32 @@
     </div>
     <div class="form-group">
       <label for="content">자기소개</label>
-      <textarea rows="5" class="form-control" id="content" name="content" placeholder="자기소개를 입력하세요."></textarea>
+      <textarea rows="5" class="form-control" id="content" name="content"  placeholder="자기소개를 입력하세요.">${vo.content }</textarea>
     </div>
     <div class="form-group">
       <div class="form-check-inline">
         <span class="input-group-text">정보공개</span>  &nbsp; &nbsp; 
 			  <label class="form-check-label">
-			    <input type="radio" class="form-check-input" name="userInfor" value="공개" checked/>공개
+			    <input type="radio" class="form-check-input" name="userInfor" value="공개" <c:if test="${vo.userInfor == '공개' }">checked</c:if>/>공개
 			  </label>
 			</div>
 			<div class="form-check-inline">
 			  <label class="form-check-label">
-			    <input type="radio" class="form-check-input" name="userInfor" value="비공개"/>비공개
+			    <input type="radio" class="form-check-input" name="userInfor" value="비공개" <c:if test="${vo.userInfor == '비공개' }">checked</c:if>/>비공개
 			  </label>
 			</div>
     </div>
     <div  class="form-group">
       회원 사진(파일용량:2MByte이내) :
-      <input type="file" name="fName" id="file" class="form-control-file border"/>
+      <input type="file" name="fName" id="file" onchange="photoChange()" class="form-control-file border"/>(${vo.photo})
+      <c:if test="${vo.photo != ''}">
+      <img src="${ctp}/member/${vo.photo}">
+      </c:if>
+      <c:if test="${vo.photo == ''}">
+      <h4>사진없음</h4>
+      </c:if>
     </div>
-    <button type="button" class="btn btn-secondary" onclick="fCheck()">회원가입</button> &nbsp;
+    <button type="button" class="btn btn-secondary" onclick="fCheck()">회원 정보 수정</button> &nbsp;
     <button type="reset" class="btn btn-secondary">다시작성</button> &nbsp;
     <button type="button" class="btn btn-secondary" onclick="location.href='${ctp}/member/memberLogin';">돌아가기</button>
     <input type="hidden" name="photo"/>

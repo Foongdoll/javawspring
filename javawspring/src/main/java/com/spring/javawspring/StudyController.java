@@ -20,6 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
 import com.spring.javawspring.common.ARIAUtil;
 import com.spring.javawspring.common.SecurityUtil;
@@ -32,7 +34,6 @@ import com.spring.javawspring.vo.MemberVO;
 @Controller
 @RequestMapping("/study")
 public class StudyController {
-
 	@Autowired
 	StudyService studyService;
 	
@@ -230,32 +231,29 @@ public class StudyController {
 			
 			// 메세지 보관함의 내용(content)에 필요한 정보를 추가로 담아서 전송시킬수 있도록 한다.
 			content = content.replace("\n", "<br/>");
-//			content += "<p><img src=\"cid:main.JPG\" width='500px'></p>";
-//			content += "<br/><hr><h3><a href='http://49.142.157.251:9090/green2209J_10/artMain.art'>그린 옥션</a></h3><hr><br/>";
-//			content += "<br/><hr><h3>CJ Green에서 보냅니다.</h3><hr><br/>";
-//			content += "<hr/>";
+			content += "<p><img src=\"cid:main.JPG\" width='500px'></p>";
+			content += "<br/><hr><h3><a href='http://49.142.157.251:9090/green2209J_10/artMain.art'>그린 옥션</a></h3><hr><br/>";
+			content += "<br/><hr><h3>CJ Green에서 보냅니다.</h3><hr><br/>";
+			content += "<hr/>";
 			
 			messageHelper.setText(content, true);
 			
 			// 본문에 기재된 그림 파일의 경로를 따로 표시시켜준다. 그리고 보관함에 다시 저장시켜준다.
-			/*
-			 * FileSystemResource file = new FileSystemResource(
-			 * "D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\main.JPG"
-			 * ); messageHelper.addInline("main.JPG", file); file = new FileSystemResource(
-			 * "D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\chicago.jpg"
-			 * ); messageHelper.addAttachment("chicago.jpg", file);
-			 * 
-			 * file = new FileSystemResource(
-			 * "D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\paris.jpg"
-			 * ); messageHelper.addAttachment("paris.jpg", file);
-			 * 
-			 * // file = new
-			 * FileSystemResource(request.getRealPath("/resources/images/paris.jpg")); file
-			 * = new
-			 * FileSystemResource(request.getSession().getServletContext().getRealPath(
-			 * "/resources/images/paris.jpg")); messageHelper.addAttachment("paris.jpg",
-			 * file);
-			 */
+			
+			FileSystemResource file = new FileSystemResource("D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\main.JPG");
+			messageHelper.addInline("main.JPG", file); 
+			
+			file = new FileSystemResource("D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\chicago.jpg");
+			messageHelper.addAttachment("chicago.jpg", file);
+			
+			file = new FileSystemResource("D:\\JavaWorkspace\\springframework\\Works\\javawspring\\src\\main\\webapp\\resources\\images\\paris.jpg");
+			messageHelper.addAttachment("paris.jpg", file);
+			
+			file = new FileSystemResource(request.getRealPath("/resources/images/paris.jpg")); 
+			
+			file = new FileSystemResource(request.getSession().getServletContext().getRealPath("/resources/images/paris.jpg")); 
+			messageHelper.addAttachment("paris.jpg",file);
+			 
 			// 메일 전송하기
 			mailSender.send(message);
 			
@@ -288,7 +286,18 @@ public class StudyController {
 		
 		return vos;
 	}
+	@RequestMapping(value = "/fileUpload/fileUploadForm", method = RequestMethod.GET)
+	public String fileUploadFormGet() {
+		return "study/fileUpload/fileUploadForm";
+	}
 	
+	@RequestMapping(value = "/fileUpload/fileUploadForm", method = RequestMethod.POST)
+	public String fileUploadFormPost(MultipartFile fName, HttpServletRequest request) {
+		int res = studyService.FileUpload(fName,request);
+		
+		if(res == 1) return "redirect:/msg/fileUploadOk"; 
+		return "redirect:/msg/fileUploadNo";
+	}
 	
 	
 }

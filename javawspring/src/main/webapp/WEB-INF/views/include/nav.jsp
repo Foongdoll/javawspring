@@ -19,6 +19,7 @@
         <a href="${ctp}/study/ajax/ajaxMenu" class="w3-bar-item w3-button">AJax연습</a>
         <a href="${ctp}/study/mail/mailForm" class="w3-bar-item w3-button">메 일 연 습</a>
         <a href="${ctp}/study/uuid/uuidForm" class="w3-bar-item w3-button">UUID</a>
+        <a href="${ctp}/study/fileUpload/fileUploadForm" class="w3-bar-item w3-button">파일업로드 연습</a>
         <a href="#" class="w3-bar-item w3-button">달 력</a>
         <c:if test="${sLevel == 0}">
         <a href="#" class="w3-bar-item w3-button">관리자 메뉴</a>
@@ -43,7 +44,7 @@
       <div class="w3-dropdown-content w3-bar-block w3-card-4">
         <a href="${ctp}/member/memberMain" class="w3-bar-item w3-button">회원 메인화면</a>
         <a href="${ctp}/member/memberList<c:if test="${sLevel == 4}">?sw=1</c:if>" class="w3-bar-item w3-button">회원 리스트</a>
-        <a href="#" class="w3-bar-item w3-button">정보 수정</a>
+        <a href="${ctp}/member/memberInforUpdate" class="w3-bar-item w3-button">회원정보수정</a>
         <a href="${ctp}/member/memberPwdChange" class="w3-bar-item w3-button">비밀번호 변경</a>
         <a href="${ctp}/member/memberDel" class="w3-bar-item w3-button">회원 탈퇴</a>
         <c:if test="">

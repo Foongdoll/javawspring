@@ -21,7 +21,9 @@
 		select * from member2 where ${category} = #{searchStr};
 	</select>
 	
-	
+	<select id="getMemberFileName" resultType="String">
+		select photo from member2 where mid = #{mid}
+	</select>
 	
 	<update id="setMemTotalUpdate">
 		update member2 set lastDate = now(),point = #{nowTodayPoint},visitCnt = visitCnt+1,todayCnt = #{todayCnt} where mid = #{mid};
@@ -39,9 +41,13 @@
 		update member2 set pwd = #{encPswd} where mid = #{mid}
 	</update>
 	
+	<update id="setMemberInforUpdate">
+		update member2 set name = #{vo.name}, email = #{vo.email}, gender = #{vo.gender}, birthday = #{vo.birthday}, tel = #{vo.tel}, address = #{vo.address}, homePage = #{vo.homePage}, job = #{vo.job}, hobby = #{vo.hobby}, content = #{vo.content}, userInfor = #{vo.userInfor}, photo = #{vo.photo} where mid = #{vo.mid}
+	</update>
+	
 	
 	<insert id="getMemberJoinOk">
-		insert into member2 values(default,#{vo.mid},#{vo.pwd},#{vo.nickName},#{vo.name},#{vo.gender},#{vo.birthday},#{vo.tel},#{vo.address},#{vo.email},#{vo.homePage},#{vo.job},#{vo.hobby},#{vo.photo},#{vo.content},#{vo.userInfor},default,default,default,default,default,default,default);
+		insert into member2 values(default,#{vo.mid},#{vo.pwd},#{vo.nickName},#{vo.name},#{vo.gender},#{vo.birthday},#{vo.tel},#{vo.address},#{vo.email},#{vo.homePage},#{vo.job},#{vo.hobby},#{vo.photo},#{vo.content},#{vo.userInfor},default,default,default,default,default,default,default,default);
 	</insert>
 	
 	

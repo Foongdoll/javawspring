@@ -90,6 +90,22 @@ public class MessageController {
 			model.addAttribute("msg", "회원 정보가 일치하지않습니다.");
 			model.addAttribute("url", "member/memberPwdSearch?pwdSw=0");
 		}
+		else if(msgFlag.equals("fileUploadOk")) {
+			model.addAttribute("msg", "파일업로드에 성공하셨습니다..");
+			model.addAttribute("url", "study/fileUpload/fileUploadForm");
+		}
+		else if(msgFlag.equals("fileUploadNo")) {
+			model.addAttribute("msg", "파일업로드 실패하셨습니다.");
+			model.addAttribute("url", "study/fileUpload/fileUploadForm");
+		}
+		else if(msgFlag.equals("memberInforUpdateOk")) {
+			model.addAttribute("msg", "회원정보수정이 성공적으로 처리되었습니다.");
+			model.addAttribute("url", "member/memberMain");
+		}
+		else if(msgFlag.equals("memberInforUpdateNo")) {
+			model.addAttribute("msg", "회원정보수정에 실패하였습니다.");
+			model.addAttribute("url", "member/memberMain");
+		}
 		
 		
 		return "include/message";

@@ -1,10 +1,20 @@
 package com.spring.javawspring.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.javawspring.common.JavawspringProvide;
 import com.spring.javawspring.dao.StudyDAO;
 import com.spring.javawspring.vo.GuestVO;
 import com.spring.javawspring.vo.MemberVO;
@@ -146,5 +156,24 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public ArrayList<MemberVO> getMemberMail() {
 		return studyDAO.getMemberMail();
+	}
+
+	@Override
+	public int FileUpload(MultipartFile fName,HttpServletRequest request) {
+		int res = 0;
+		
+		try {
+		  String uid = UUID.randomUUID().toString();
+		  String oFileName = fName.getOriginalFilename();
+		  String saveFileName = uid +"_"+oFileName;
+		  String realPath = request.getSession().getServletContext().getRealPath("/resources/pds/temp/");
+		  
+		  new JavawspringProvide().writerFile(fName, saveFileName, request, realPath);
+		  res = 1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return res;
 	}
 }

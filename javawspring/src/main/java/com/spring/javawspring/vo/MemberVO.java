@@ -31,4 +31,16 @@ public class MemberVO {
 	
 	
 	private String res;
+	private String email1;
+	private String email2;
+	
+	private String tel1;
+	private String tel2;
+	private String tel3;
+	
+	private String postcode;
+	private String roadAddress;
+	private String detailAddress;
+	private String extraAddress;
+	
 }
