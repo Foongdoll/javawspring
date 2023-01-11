@@ -1,6 +1,10 @@
 package com.spring.javawspring;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -49,7 +53,7 @@ public class AdminController {
 	}
 	
 	
-	@RequestMapping(value = "adminMemberList", method =  RequestMethod.GET)
+	@RequestMapping(value = "/adminMemberList", method =  RequestMethod.GET)
 	public String memberListGet(Model model,PageVO vo ,
 			@RequestParam(name="pag", defaultValue = "1", required = false) int pag,
 			@RequestParam(name="pageSize", defaultValue = "5", required = false) int pageSize) {
@@ -105,7 +109,7 @@ public class AdminController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/adminMemberDel", method = RequestMethod.POST)
-	public String adminMemberDelGet(int idx) {
+	public String adminMemberDelPost(int idx) {
 		int res = 0;
 		
 		res = adminService.setMemberDelete(idx);
@@ -113,5 +117,33 @@ public class AdminController {
 		return String.valueOf(res);
 	}
 	
+	@RequestMapping(value = "/file/fileList", method =  RequestMethod.GET)
+	public String fileListGet(Model model,HttpServletRequest request) {
+		String realPath = request.getRealPath("/resources/data/ckeditor/");
+		String[] files = new File(realPath).list();
+		
+		model.addAttribute("files",files);
+		
+		return "admin/file/fileList";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/file/imsiFileDelete", method = RequestMethod.POST)
+	public String imsiFileDeletePost(String file,HttpServletRequest request) {
+
+		int res = adminService.setImsiFileDelete(file,request);
+		
+		return String.valueOf(res);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/file/imsiFileSelectDelete", method = RequestMethod.POST)
+	public String imsiFileAllDeletePost(String allFile,HttpServletRequest request) {
+		
+		int res = adminService.setImsiFileSelectDelete(allFile,request);
+		
+		
+		return String.valueOf(res);
+	}
 	
 }

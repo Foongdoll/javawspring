@@ -22,17 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Handles requests for the application home page.
- */
 @Controller
 public class HomeController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
 	@RequestMapping(value = {"/","/h"}, method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
 		logger.info("Welcome home! The client locale is {}.", locale);
@@ -68,6 +62,7 @@ public class HomeController {
 		return "redirect:/msg/adminLogoutOk?mid="+mid;
 	}
 	
+	
 	@RequestMapping(value = "/imageUpload")
 	public void imageUploadGet(MultipartFile upload,
 			HttpServletRequest request,
@@ -83,13 +78,13 @@ public class HomeController {
 		oFileName = sdf.format(date) + "_"+ oFileName;
 		
 		byte[] data = upload.getBytes();
-		String realPath = request.getRealPath("/resources/data/board");
+		String realPath = request.getRealPath("/resources/data/ckeditor");
 		
 		OutputStream fos = new FileOutputStream(new File(realPath+"/"+oFileName));
 		fos.write(data);
 
 		PrintWriter out = response.getWriter();
-		String fileUrl = request.getContextPath()+"/board/"+oFileName;
+		String fileUrl = request.getContextPath()+"/data/ckeditor/"+oFileName;
 		out.println("{\"originalFilename\":\""+oFileName+"\",\"uploaded\":1, \"url\":\""+fileUrl+"\"}");
 		
 		out.flush();

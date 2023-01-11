@@ -1,10 +1,12 @@
 package com.spring.javawspring.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.spring.javawspring.vo.BoardVO;
+import com.spring.javawspring.vo.GoodVO;
 
 public interface BoardDAO {
 
@@ -19,6 +21,16 @@ public interface BoardDAO {
 	public void setBoardReadNum(@Param("idx") int idx);
 
 	public int setBoardGood(@Param("idx") int idx);
+
+	public GoodVO getBoardGoodCheck(@Param("partIdx") int partIdx,@Param("part") String part,@Param("mid") String mid);
+
+	public ArrayList<BoardVO> getPrevNext(@Param("idx") int idx);
+
+	public void setBoardDeleteOk(@Param("idx") int idx);
+
+	public void setContentUpdateOk(@Param("vo") BoardVO vo);
+
+	public void setBoardGoodFinger(@Param("idx") int idx,@Param("goodCnt") int goodCnt,@Param("good") int good);
 
 
 }

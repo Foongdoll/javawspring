@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.javawspring.vo.BoardVO;
 import com.spring.javawspring.vo.MemberVO;
 
 public interface MemberService {
@@ -32,5 +33,6 @@ public interface MemberService {
 	public void setNewEncPswd(String encPswd, String mid);
 
 	public int setMemberInforUpdate(MemberVO vo, MultipartFile fName, HttpServletRequest request);
+
 
 }

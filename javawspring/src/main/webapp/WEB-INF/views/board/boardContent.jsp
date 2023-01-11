@@ -28,28 +28,19 @@
     	});
     }
     
-    function goodCheckPlus() {
-    	$.ajax({
-    		type  : "post",
-    		url   : "${ctp}/boGoodPlusMinus.bo",
-    		data  : {
-    			idx : ${vo.idx},
-    			goodCnt : 1
-    		},
-    		success:function() {
-    			location.reload();
-    		}
-    	});
-    }
     
-    function goodCheckMinus() {
+    
+    function goodCheckPlusMinus(GoodCnt,idx) {
+    	
+    	let query = {
+    			GoodCnt,
+    			idx
+    	}
+    	
     	$.ajax({
     		type  : "post",
-    		url   : "${ctp}/boGoodPlusMinus.bo",
-    		data  : {
-    			idx : ${vo.idx},
-    			goodCnt : -1
-    		},
+    		url   : "${ctp}/board/boardGoodPlusMinus",
+    		data  : query,
     		success:function() {
     			location.reload();
     		}
@@ -57,9 +48,9 @@
     }
     
     // 게시글 삭제처리
-    function boDelCheck() {
+    function boardDelCheck() {
     	let ans = confirm("현 게시글을 삭제하시겠습니까?");
-    	if(ans) location.href = "${ctp}/boDeleteOk.bo?idx=${vo.idx}&pag=${pag}&pageSize=${pageSize}&mid=${vo.mid}";
+    	if(ans) location.href = "${ctp}/board/boardDeleteOk?idx=${vo.idx}&pag=${pag}&pageSize=${pageSize}";
     }
     
     // 댓글 달기
@@ -120,6 +111,29 @@
     		}
     	});
     }
+    let totSw = 0;
+    function goodDBCheck(sw){
+    	totSw += sw;
+    	let idx = ${vo.idx};
+    	let query = {
+    			totSw : totSw,
+    			idx : idx
+    	}
+    	
+    	$.ajax({
+    		type  : "post",
+    		url   : "${ctp}/board/boardGoodDBCheck",
+    		data  : query,
+    		success:function(res) {
+    			location.reload();
+    		},
+    		error  : function() {
+    			alert("전송 오류~~");
+    		}
+    	});
+    	
+    	
+    }
   </script>
 </head>
 <body>
@@ -156,12 +170,18 @@
       <td>${vo.homePage}</td>
       <th>좋아요</th>
       <td><a href="javascript:goodCheck()">
-            <c:if test="${sSw == '1'}"><font color="red">❤</font></c:if>
-            <c:if test="${sSw != '1'}">❤</c:if>
+            <%-- <c:if test="${sSw == '1'}"><font color="red">❤</font></c:if>
+            <c:if test="${sSw != '1'}">❤</c:if> --%>
+            <c:if test="${goodVO.goodSw == 'Y'}"><font color="red">❤</font></c:if>
+            <c:if test="${goodVO.goodSw != 'Y'}">❤</c:if>
           </a>
           ${vo.good} ,
-          <a href="javascript:goodCheckPlus()">👍</a>
-          <a href="javascript:goodCheckMinus()">👎</a>
+          <a href="javascript:goodCheckPlusMinus(1,${vo.idx})">👍</a>
+          <a href="javascript:goodCheckPlusMinus(-1,${vo.idx})">👎</a>
+          <a href="javascript:goodDBCheck(1)">
+           	<c:if test="${goodVO.goodSw == 'Y'}"><font color="red">❤</font></c:if>
+            <c:if test="${goodVO.goodSw != 'Y'}">❤</c:if>(토글,DB)
+          </a>
       </td>
     </tr>
     <tr>
@@ -175,7 +195,7 @@
           <input type="button" value="돌아가기" onclick="location.href='${ctp}/board/boardList?pageSize=${pageSize}&pag=${pag}';" class="btn btn-secondary"/>
 	        <c:if test="${sMid == vo.mid || sLevel == 0}">
 		        <input type="button" value="수정하기" onclick="location.href='${ctp}/board/boardUpdate?idx=${vo.idx}&pageSize=${pageSize}&pag=${pag}';" class="btn btn-success"/>
-		        <input type="button" value="삭제하기" onclick="boDelCheck()" class="btn btn-danger"/>
+		        <input type="button" value="삭제하기" onclick="boardDelCheck()" class="btn btn-danger"/>
 	        </c:if>
         </c:if>
       </td>
@@ -187,12 +207,35 @@
 	  <table class="table table-borderless">
 	    <tr>
 	      <td>
+ 					<%-- 		      
 	        <c:if test="${preVo.preIdx != 0}">
 	          👈 <a href="${ctp}/boContent.bo?idx=${preVo.preIdx}&pageSize=${pageSize}&pag=${pag}">이전글 : ${preVo.preTitle}</a><br/>
 	        </c:if>
 	        <c:if test="${nextVo.nextIdx != 0}">
 	          👉 <a href="${ctp}/boContent.bo?idx=${nextVo.nextIdx}&pageSize=${pageSize}&pag=${pag}">다음글 : ${nextVo.nextTitle}</a>
 	        </c:if>
+	         --%>
+	         
+	        <c:if test="${!empty pnVos[1]}">
+	          다음글 :  <a href="${ctp}/board/boardContent?idx=${pnVos[1].idx}&pageSize=${pageSize}&pag=${pag}"> ${pnVos[1].title}</a><br/>
+	        </c:if>
+	        <c:if test="${vo.idx < pnVos[0].idx}">
+	          다음글 :  <a href="${ctp}/board/boardContent?idx=${pnVos[0].idx}&pageSize=${pageSize}&pag=${pag}"> ${pnVos[0].title}</a><br/>
+	        </c:if>
+	        <c:if test="${vo.idx > pnVos[0].idx}">
+	          이전글 :  <a href="${ctp}/board/boardContent?idx=${pnVos[0].idx}&pageSize=${pageSize}&pag=${pag}"> ${pnVos[0].title}</a><br/>
+	        </c:if>
+	        
+	        <%--  <c:if test="${!empty pnVos[1]}">
+	          다음글 : <a href="${ctp}/board/boardContent?idx=${pnVos[1].idx}&pageSize=${pageSize}&pag=${pag}">${pnVos[1].title}</a><br/>
+	        </c:if>
+	        <!-- 아래는 이전글 처리루틴.... -->
+	        <c:if test="${vo.idx < pnVos[0].idx}">
+	          다음글 : <a href="${ctp}/board/boardContent?idx=${pnVos[0].idx}&pageSize=${pageSize}&pag=${pag}">${pnVos[0].title}</a><br/>
+	        </c:if>
+	        <c:if test="${vo.idx > pnVos[0].idx}">
+	          이전글 : <a href="${ctp}/board/boardContent?idx=${pnVos[0].idx}&pageSize=${pageSize}&pag=${pag}">${pnVos[0].title}</a><br/>
+	        </c:if> --%>
 	      </td>
 	    </tr>
 	  </table>

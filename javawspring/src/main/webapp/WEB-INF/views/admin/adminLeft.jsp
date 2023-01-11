@@ -25,6 +25,10 @@
   <p>
     <a href="${ctp}/admin/member/adminMemberList" target="adminContent">회원리스트</a>
   </p>
+  <hr/>
+  <p>
+    <a href="${ctp}/admin/file/fileList" target="adminContent">임시파일</a>
+  </p>
 </div>
 <p><br/></p>
 </body>
