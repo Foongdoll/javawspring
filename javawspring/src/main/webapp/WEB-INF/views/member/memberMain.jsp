@@ -17,7 +17,7 @@
   <hr/>
   <div id="memberInfo1" class="mr-5">
 	  <p><font color="blue"><b>${sNickName}</b></font>님 로그인 중이십니다.</p>
-	  <p>현재 <font color="blue"><b>${sStrLevel}</b></font> 등급 이십니다.</p>
+	  <p>현재 <font color="blue"><b>${sStrLevel}</b></font> 등급 이십니다.(${sLevel })</p>
 	  <p>누적 포인트 : <span class="viewCheck">${vo.point}</span></p>
 	  <p>최종 접속일 : <span class="viewCheck">${fn:substring(vo.lastDate,0,fn:length(vo.lastDate)-2)}</span></p>
 	  <p>총 방문횟수 : <span class="viewCheck">${vo.visitCnt}</span></p>

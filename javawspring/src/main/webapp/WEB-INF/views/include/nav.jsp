@@ -8,7 +8,7 @@
     <a href="${ctp}/" class="w3-bar-item w3-button w3-padding-large">HOME</a>
     <a href="${ctp}/guest/guestList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">GUEST</a>
     <c:if test="${sLevel < 5 || sLevel >= 0 }">
-    <a href="${ctp}/board/boardList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">BOARD</a>
+    <a href="${ctp}/board/boardList<c:if test="${sLevel == '4'}">?sw=1</c:if>" class="w3-bar-item w3-button w3-padding-large w3-hide-small">BOARD</a>
     <a href="${ctp}/pds/pdsList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">PDS</a>
     <div class="w3-dropdown-hover w3-hide-small">
       <button class="w3-padding-large w3-button" >STUDY1<i class="fa fa-caret-down"></i></button>     
@@ -47,8 +47,8 @@
         <a href="${ctp}/member/memberInforUpdate" class="w3-bar-item w3-button">회원정보수정</a>
         <a href="${ctp}/member/memberPwdChange" class="w3-bar-item w3-button">비밀번호 변경</a>
         <a href="${ctp}/member/memberDel" class="w3-bar-item w3-button">회원 탈퇴</a>
-        <c:if test="">
-        <a href="#" class="w3-bar-item w3-button">관리자 메뉴</a>
+        <c:if test="${sLevel ==  0}">
+        <a href="${ctp}/admin/adminMain" class="w3-bar-item w3-button">관리자 메뉴</a>
         </c:if>
       </div>
     </div>

@@ -52,16 +52,19 @@
       <th>성별</th>
     </tr>
     <c:set var="curScrStartNo" value="${pageVO.curScrStartNo}"/>
-    <c:forEach var="vo" items="${vos}" varStatus="st">
-      <tr>
-        <td>${curScrStartNo}</td>
-        <td><a href="${ctp}/member/memberInfor?mid=${vo.mid}&pag=${pageVO.pag}">${vo.mid}</a></td>
-        <td>${vo.nickName}</td>
-        <td>${vo.name}<c:if test="${sLevel == 0 && vo.userInfor == '비공개'}"><font color='red'>(비공개)</font></c:if></td>
-        <td>${vo.gender}</td>
-      </tr>
-      <c:set var="curScrStartNo" value="${curScrStartNo-1}"/>
-    </c:forEach>
+     <c:if test="${empty vos}"><tr><td colspan="8">찾으시는 자료가 없습니다</td></tr></c:if>
+    <c:if test="${!empty vos}">
+	    <c:forEach var="vo" items="${vos}" varStatus="st">
+	      <tr>
+	        <td>${curScrStartNo}</td>
+	        <td><a href="${ctp}/member/memberInfor?mid=${vo.mid}&pag=${pageVO.pag}">${vo.mid}</a></td>
+	        <td>${vo.nickName}</td>
+	        <td>${vo.name}<c:if test="${sLevel == 0 && vo.userInfor == '비공개'}"><font color='red'>(비공개)</font></c:if></td>
+	        <td>${vo.gender}</td>
+	      </tr>
+	      <c:set var="curScrStartNo" value="${curScrStartNo-1}"/>
+	    </c:forEach>
+    </c:if>
     <tr><td colspan="5" class="m-0 p-0"></td></tr>
   </table>
 </div>

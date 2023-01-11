@@ -17,6 +17,9 @@
 	<resources mapping="/images/**" location="/resources/images/" />
 	<resources mapping="/js/**" location="/resources/js/" />
 	<resources mapping="/member/**" location="/resources/member/" />
+	<resources mapping="/board/**" location="/resources/data/board/" />
+	<resources mapping="/ckeditor/**" location="/resources/ckeditor/" />
+	
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -65,8 +68,8 @@
 			<beans:ref bean="memberInterceptor"/>
 		</interceptor>
 		<interceptor>
-			<mapping path="/board/boardList"/>
-			<mapping path="/member/memberList"/>
+			<mapping path="/board/**"/>
+			<exclude-mapping path="/member/memberMain"/>
 			<beans:ref bean="otherInterceptor"/>
 		</interceptor>
 	</interceptors>

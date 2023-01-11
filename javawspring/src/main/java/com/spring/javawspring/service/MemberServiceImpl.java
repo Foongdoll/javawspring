@@ -184,15 +184,23 @@ public class MemberServiceImpl implements MemberService {
 		
 		String uid = UUID.randomUUID().toString();
 		String oFileName = fName.getOriginalFilename();
-		String saveFileName = uid+"_"+oFileName;
+		String saveFileName = "";
+		if(!oFileName.equals("")) saveFileName = uid+"_"+oFileName;
+		else saveFileName = vo.getPhoto();
 		String realPath = request.getRealPath("/resources/member/");
 		String photo = memberDAO.getMemberFileName((String)request.getSession().getAttribute("sMid"));
 		
-		if(!vo.getPhoto().equals(photo)) {
+		
+		if(oFileName.equals("noimage.jpg")) {
+			try {
+				new JavawspringProvide().writerFile(fName, "noimage.jpg", request, realPath);
+			} catch (IOException e) {e.printStackTrace();}
+			vo.setPhoto("noimage.jpg");
+			return memberDAO.setMemberInforUpdate(vo);
+		}
+		if(vo.getPhoto().equals("")) {
 			File file = new File(realPath+"/"+photo);
-			if(file.exists()) {
-				file.delete();
-			}
+			if(file.exists()) file.delete();
 			try {
 				new JavawspringProvide().writerFile(fName, saveFileName, request, realPath);
 			} catch (IOException e) {e.printStackTrace();}
@@ -200,11 +208,21 @@ public class MemberServiceImpl implements MemberService {
 			vo.setPhoto(saveFileName);
 		}
 		else {
-			
+			vo.setPhoto(saveFileName);
 		}
-		
+			
 		return memberDAO.setMemberInforUpdate(vo);
 	}
 
-	
+	/*새로운걸 넣었을때
+	 * vo.photo : d28fbb21-bf9f-4f16-8c22-9bdf6baa1e26_2.jpg oFileName :
+	 * saveFileName : 10ef7583-927d-482d-b30c-2abb40f6abf7_ photo
+	 * d28fbb21-bf9f-4f16-8c22-9bdf6baa1e26_2.jpg
+	 * 같은걸 다시 넣었을때
+	 * 
+	 * vo.photo : 
+	   oFileName : 2.jpg
+	   saveFileName : d28fbb21-bf9f-4f16-8c22-9bdf6baa1e26_2.jpg
+	   photo b05a57b5-b828-4eb3-9d50-7f9c0bf214bc_
+	 */
 }

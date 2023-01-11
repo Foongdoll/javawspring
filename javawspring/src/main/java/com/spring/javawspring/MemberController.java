@@ -314,17 +314,21 @@ public class MemberController {
 	}
 	
 	@RequestMapping(value = "/memberDel", method = RequestMethod.POST)
-	public String memberDelPost(String mid, String pwd, String nickName) {
+	public String memberDelPost(String mid, String pwd, String nickName,HttpSession session) {
 		MemberVO vo = memberService.getMemberIdCheck(mid);
 		
-		if(!PasswordEncoder.matches(pwd, vo.getPwd()) || vo.getMid() == null || vo.getNickName() != nickName) {
+		String smid = (String)session.getAttribute("sMid");
+		String snickName = (String)session.getAttribute("sNickName");
+		
+		if(!PasswordEncoder.matches(pwd, vo.getPwd())|| !smid.equals(mid) || !snickName.equals(nickName)) {
 			return "redirect:/msg/memberDelNo";
 		}
+		else {
+			memberService.setMemberDel(mid);
+			session.invalidate();
+			return "redirect:/msg/memberDelOk?mid="+mid;
+		}
 		
-		memberService.setMemberDel(mid);
-		
-		
-		return "member/memberDel";
 	}
 	
 	

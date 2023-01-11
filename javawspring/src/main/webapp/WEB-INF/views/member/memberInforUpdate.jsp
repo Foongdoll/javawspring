@@ -85,10 +85,10 @@
     	  submitFlag = 1;
       }
   		// 전송전에 '주소'를 하나로 묶어서 전송처리 준비한다.
-  		let postcode = myform.postcode.value + " ";
-  		let roadAddress = myform.roadAddress.value + " ";
-  		let detailAddress = myform.detailAddress.value + " ";
-  		let extraAddress = myform.extraAddress.value + " ";
+  		let postcode = myform.postcode.value
+  		let roadAddress = myform.roadAddress.value
+  		let detailAddress = myform.detailAddress.value
+  		let extraAddress = myform.extraAddress.value
   		myform.address.value = postcode + "/" + roadAddress + "/" + detailAddress + "/" + extraAddress + "/";
   		// 전송전에 파일에 관한 사항체크...(회원사진의 내역이 비었으면 noimage를 hidden필드인 photo필드에 담아서 전송한다.)
   		if(fName.trim() == "") {
@@ -304,7 +304,7 @@
     </div>
     <div  class="form-group">
       회원 사진(파일용량:2MByte이내) :
-      <input type="file" name="fName" id="file" onchange="photoChange()" class="form-control-file border"/>(${vo.photo})
+      <input type="file" name="fName" id="file" value="${vo.photo}" class="form-control-file border"/>(${vo.photo})
       <c:if test="${vo.photo != ''}">
       <img src="${ctp}/member/${vo.photo}">
       </c:if>
@@ -316,7 +316,7 @@
     <button type="reset" class="btn btn-secondary">다시작성</button> &nbsp;
     <button type="button" class="btn btn-secondary" onclick="location.href='${ctp}/member/memberLogin';">돌아가기</button>
     <input type="hidden" name="photo"/>
-    <input type="hidden" name="tel"/>
+    <input type="hidden" name="tel"  />
     <input type="hidden" name="email"/>
   </form>
 </div>

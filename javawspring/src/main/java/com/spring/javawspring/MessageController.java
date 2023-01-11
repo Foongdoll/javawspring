@@ -80,7 +80,11 @@ public class MessageController {
 		}
 		else if(msgFlag.equals("memberDelNo")) {
 			model.addAttribute("msg", "회원 정보가 일치하지 않습니다.");
-			model.addAttribute("url", "member/memberList");
+			model.addAttribute("url", "member/memberMain");
+		}
+		else if(msgFlag.equals("memberDelOk")) {
+			model.addAttribute("msg", mid+"님 회원 탈퇴가 정상처리되셨습니다. \\n 이용해주셔서 감사합니다.");
+			model.addAttribute("url", "member/memberLogin");
 		}
 		else if(msgFlag.equals("memberPwdSearchOk")) {
 			model.addAttribute("msg", "인증 번호가 이메일로 발송되었습니다.");
@@ -104,6 +108,14 @@ public class MessageController {
 		}
 		else if(msgFlag.equals("memberInforUpdateNo")) {
 			model.addAttribute("msg", "회원정보수정에 실패하였습니다.");
+			model.addAttribute("url", "member/memberMain");
+		}
+		else if(msgFlag.equals("boardInputOk")) {
+			model.addAttribute("msg", "글이 등록되었습니다.");
+			model.addAttribute("url", "board/boardList");
+		}
+		else if(msgFlag.equals("boardInputNo")) {
+			model.addAttribute("msg", "글이 등록되지않았습니다.");
 			model.addAttribute("url", "member/memberMain");
 		}
 		

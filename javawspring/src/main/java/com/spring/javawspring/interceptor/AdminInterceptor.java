@@ -13,7 +13,7 @@ public class AdminInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		int level = request.getSession().getAttribute("sLevel") == null ? 99 : Integer.parseInt((String) request.getSession().getAttribute("sLevel")); 
+		int level = request.getSession().getAttribute("sLevel") == null ? 99 : (int)request.getSession().getAttribute("sLevel");
 		
 		if(level != 0) { // 관리자가 아닌경우는 메세지를 통해서 무조건 초기화면창으로 보내준다.
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/msg/adminNo");

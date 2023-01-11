@@ -18,8 +18,9 @@ public class PageVO {
 	private String mid;
 	
 	
-	// 게스트 테이블
+	// 게스트 테이블, 보드 테이블 검색기
 	private String searchStr;
 	private String category;
+	
 	
 }
